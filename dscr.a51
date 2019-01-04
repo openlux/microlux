@@ -59,7 +59,7 @@ _dev_dscr:
     .dw 0xB404                    ; vendor id
     .dw 0x1386                    ; product id
     .dw 0x0100                    ; version id
-    .db 0                         ; manufacturure str idx
+    .db 1                         ; manufacturure str idx
     .db 2                         ; product str idx
     .db 0                         ; serial str idx
     .db 1                         ; n configurations
@@ -249,6 +249,46 @@ _string0:
     .db DSCR_STRING_TYPE
     .db 0x09, 0x04 ; 0x0409 is the language code for English.  Possible to add more codes after this.
 string0end:
+
+_string1:
+    .db string1end-_string1 ; len
+    .db DSCR_STRING_TYPE
+    .ascii 'o'
+    .db 0
+    .ascii 'p'
+    .db 0
+    .ascii 'e'
+    .db 0
+    .ascii 'n'
+    .db 0
+    .ascii 'l'
+    .db 0
+    .ascii 'u'
+    .db 0
+    .ascii 'x'
+    .db 0
+string1end:
+
+_string2:
+    .db string2end-_string2 ; len
+    .db DSCR_STRING_TYPE
+    .ascii 'm'
+    .db 0
+    .ascii 'i'
+    .db 0
+    .ascii 'c'
+    .db 0
+    .ascii 'r'
+    .db 0
+    .ascii 'o'
+    .db 0
+    .ascii 'l'
+    .db 0
+    .ascii 'u'
+    .db 0
+    .ascii 'x'
+    .db 0
+string2end:
 ; add more strings here
 
 
