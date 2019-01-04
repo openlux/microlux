@@ -171,7 +171,7 @@ BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
 }
 
 void handle_reset_ep(BYTE ep) {
-
+    (void) ep; /* fx2lib doesn't call this function */
 }
 
 void sudav_isr(void) __interrupt SUDAV_ISR {
