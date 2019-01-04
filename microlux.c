@@ -2,10 +2,27 @@
 #include <eputils.h>
 #include <fx2macros.h>
 #include <setupdat.h>
+#include <string.h>
 
 #define SYNCDELAY SYNCDELAY4
 
 static volatile __bit dosud = FALSE;
+static volatile __bit configured = FALSE;
+
+static void cdc_puts(const char *str) {
+    /* wait for free space in EP6 */
+    while (EP2468STAT & bmEP6FULL);
+
+    /* write str to the EP6 FIFO */
+    strcpy(EP6FIFOBUF, str);
+
+    /* send the data to the host */
+    size_t len = strlen(str);
+    EP6BCH = MSB(len);
+    SYNCDELAY;
+    EP6BCL = LSB(len);
+    SYNCDELAY;
+}
 
 void main(void) {
     /* re-enumerate */
@@ -49,6 +66,10 @@ void main(void) {
             dosud = FALSE;
             handle_setupdata();
         }
+
+        if (configured) {
+            cdc_puts("Hello, world!\r\n");
+        }
     }
 }
 
@@ -65,7 +86,11 @@ BYTE handle_get_configuration(void) {
 }
 
 BOOL handle_set_configuration(BYTE cfg) {
-    return cfg == 1;
+    if (cfg == 1) {
+        configured = TRUE;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL handle_get_interface(BYTE ifc, BYTE *alt_ifc) {
