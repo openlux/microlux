@@ -42,10 +42,17 @@ BOOL handle_set_configuration(BYTE cfg) {
 }
 
 BOOL handle_get_interface(BYTE ifc, BYTE *alt_ifc) {
+    if (ifc == 0) {
+        *alt_ifc = 0;
+        return TRUE;
+    }
     return FALSE;
 }
 
 BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
+    if (ifc == 0 && alt_ifc == 0) {
+        return TRUE;
+    }
     return FALSE;
 }
 
