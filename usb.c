@@ -7,7 +7,7 @@
 #include "usb.h"
 #include "usb_cdc.h"
 
-static volatile __bit configured = FALSE;
+volatile bool usb_configured = false;
 static volatile __bit dosud = FALSE;
 
 void usb_init(void) {
@@ -69,7 +69,7 @@ BYTE handle_get_configuration(void) {
 
 BOOL handle_set_configuration(BYTE cfg) {
     if (cfg == 1) {
-        configured = TRUE;
+        usb_configured = true;
         return TRUE;
     }
     return FALSE;
