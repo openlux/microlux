@@ -1,6 +1,7 @@
 #include <autovector.h>
 #include <fx2macros.h>
 
+#include "i2c.h"
 #include "usb.h"
 #include "usb_cdc.h"
 
@@ -8,6 +9,7 @@ void main(void) {
     /* set CPU clock frequency */
     SETCPUFREQ(CLK_48M);
 
+    i2c_init();
     usb_init();
 
     /* enable interrupts */
