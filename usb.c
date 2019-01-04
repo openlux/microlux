@@ -8,7 +8,7 @@
 #include "usb_cdc.h"
 
 volatile bool usb_configured = false;
-static volatile __bit dosud = FALSE;
+static volatile __bit dosud = false;
 
 void usb_init(void) {
     /* re-enumerate */
@@ -50,40 +50,40 @@ void usb_init(void) {
 
 void usb_tick(void) {
     if (dosud) {
-        dosud = FALSE;
+        dosud = false;
         handle_setupdata();
     }
 }
 
-BOOL handle_get_descriptor() {
-    return FALSE;
+bool handle_get_descriptor() {
+    return false;
 }
 
-BOOL handle_vendorcommand(BYTE cmd) {
+bool handle_vendorcommand(uint8_t cmd) {
     return usb_cdc_handle_command(cmd);
 }
 
-BYTE handle_get_configuration(void) {
+uint8_t handle_get_configuration(void) {
     return 1;
 }
 
-BOOL handle_set_configuration(BYTE cfg) {
+bool handle_set_configuration(uint8_t cfg) {
     if (cfg == 1) {
         usb_configured = true;
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
-BOOL handle_get_interface(BYTE ifc, BYTE *alt_ifc) {
+bool handle_get_interface(uint8_t ifc, uint8_t *alt_ifc) {
     if (ifc == 0) {
         *alt_ifc = 0;
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
-BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
+bool handle_set_interface(uint8_t ifc, uint8_t alt_ifc) {
     if (ifc == 0 && alt_ifc == 0) {
         /* reset EP1 in */
         EP1INCS |= bmEPBUSY;
@@ -102,26 +102,26 @@ BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
         RESETTOGGLE(0x86);
         RESETFIFO(0x06);
 
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
-void handle_reset_ep(BYTE ep) {
+void handle_reset_ep(uint8_t ep) {
     (void) ep; /* fx2lib doesn't call this function */
 }
 
 void sudav_isr(void) __interrupt SUDAV_ISR {
-    dosud = TRUE;
+    dosud = true;
     CLEAR_SUDAV();
 }
 
 void usbreset_isr(void) __interrupt USBRESET_ISR {
-    handle_hispeed(FALSE);
+    handle_hispeed(false);
     CLEAR_USBRESET();
 }
 
 void hispeed_isr(void) __interrupt HISPEED_ISR {
-    handle_hispeed(TRUE);
+    handle_hispeed(true);
     CLEAR_HISPEED();
 }
