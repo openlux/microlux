@@ -8,16 +8,21 @@
 static volatile __bit dosud = FALSE;
 
 void main(void) {
+    /* re-enumerate */
     RENUMERATE_UNCOND();
 
+    /* set CPU clock frequency */
     SETCPUFREQ(CLK_48M);
 
+    /* enable USB interrupt autovectoring */
     USE_USB_INTS();
 
+    /* enable USB interrupts */
     ENABLE_SUDAV();
     ENABLE_USBRESET();
     ENABLE_HISPEED();
 
+    /* configure endpoints */
     EP1INCFG = bmVALID | bmTYPE1 | bmTYPE0;
     SYNCDELAY;
 
@@ -36,6 +41,7 @@ void main(void) {
     EP8CFG &= ~bmVALID;
     SYNCDELAY;
 
+    /* enable interrupts */
     EA = 1;
 
     for (;;) {
