@@ -5,7 +5,7 @@
 
 #define SYNCDELAY SYNCDELAY4
 
-volatile __bit dosud = FALSE;
+static volatile __bit dosud = FALSE;
 
 void main(void) {
     RENUMERATE_UNCOND();
