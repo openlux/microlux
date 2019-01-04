@@ -1,4 +1,5 @@
 #include <autovector.h>
+#include <eputils.h>
 #include <fx2macros.h>
 #include <setupdat.h>
 
@@ -71,6 +72,17 @@ BOOL handle_get_interface(BYTE ifc, BYTE *alt_ifc) {
 
 BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
     if (ifc == 0 && alt_ifc == 0) {
+        /* reset EP1 in */
+        EP1INCS |= bmEPBUSY;
+
+        /* reset EP2 */
+        RESETTOGGLE(0x02);
+        RESETFIFO(0x02);
+
+        /* reset EP6 */
+        RESETTOGGLE(0x86);
+        RESETFIFO(0x06);
+
         return TRUE;
     }
     return FALSE;
