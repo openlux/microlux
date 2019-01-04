@@ -31,10 +31,21 @@ DSCR_STRING_TYPE=3
 DSCR_INTERFACE_TYPE=4
 DSCR_ENDPOINT_TYPE=5
 DSCR_DEVQUAL_TYPE=6
+DSCR_CDC_TYPE=0x24
+
+; descriptor subtypes
+DSCR_CDC_HEADER_SUBTYPE=0x00
+DSCR_CDC_CALL_MGMT_SUBTYPE=0x01
+DSCR_CDC_ACM_SUBTYPE=0x02
+DSCR_CDC_UNION_SUBTYPE=0x06
 
 ; for the repeating interfaces
 DSCR_INTERFACE_LEN=9
 DSCR_ENDPOINT_LEN=7
+DSCR_CDC_HEADER_LEN=5
+DSCR_CDC_CALL_MGMT_LEN=5
+DSCR_CDC_ACM_LEN=4
+DSCR_CDC_UNION_LEN=5
 
 ; endpoint types
 ENDPOINT_TYPE_CONTROL=0
@@ -52,9 +63,9 @@ _dev_dscr:
     .db dev_dscr_end-_dev_dscr    ; len
     .db DSCR_DEVICE_TYPE          ; type
     .dw 0x0002                    ; usb 2.0
-    .db 0xff                      ; class (vendor specific)
-    .db 0xff                      ; subclass (vendor specific)
-    .db 0xff                      ; protocol (vendor specific)
+    .db 0x02                      ; class (CDC)
+    .db 0x00                      ; subclass
+    .db 0x00                      ; protocol
     .db 64                        ; packet size (ep0)
     .dw 0xB404                    ; vendor id
     .dw 0x1386                    ; product id
@@ -69,9 +80,9 @@ _dev_qual_dscr:
     .db dev_qualdscr_end-_dev_qual_dscr
     .db DSCR_DEVQUAL_TYPE
     .dw 0x0002                              ; usb 2.0
-    .db 0xff
-    .db 0xff
-    .db 0xff
+    .db 0x02                                ; class (CDC)
+    .db 0x00                                ; subclass
+    .db 0x00                                ; protocol
     .db 64                                  ; max packet
     .db 1                                   ; n configs
     .db 0                                   ; extra reserved byte
@@ -83,44 +94,73 @@ _highspd_dscr:
     ; can't use .dw because byte order is different
     .db (highspd_dscr_realend-_highspd_dscr) % 256 ; total length of config lsb
     .db (highspd_dscr_realend-_highspd_dscr) / 256 ; total length of config msb
-    .db 1                                ; n interfaces
+    .db 2                                ; n interfaces
     .db 1                                ; config number
     .db 0                                ; config string
     .db 0x80                             ; attrs = bus powered, no wakeup
-    .db 0x32                             ; max power = 100ma
+    .db 0xfa                             ; max power = 500ma
 highspd_dscr_end:
 
 ; all the interfaces next
 ; NOTE the default TRM actually has more alt interfaces
 ; but you can add them back in if you need them.
 ; here, we just use the default alt setting 1 from the trm
+; CDC control interface
     .db DSCR_INTERFACE_LEN
     .db DSCR_INTERFACE_TYPE
     .db 0                ; index
     .db 0                ; alt setting idx
-    .db 6                ; n endpoints
-    .db 0xff             ; class
-    .db 0xff
-    .db 0xff
+    .db 1                ; n endpoints
+    .db 0x02             ; class (CDC)
+    .db 0x02             ; subclass (ACM)
+    .db 0x01             ; protocol (AT)
     .db 0                ; string index
 
-; endpoint 1 out
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x01                ;  ep1 dir=out and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x00                ; max packet LSB
-    .db 0x02                ; max packet size=512 bytes
-    .db 0x00                ; polling interval
+; CDC header
+    .db DSCR_CDC_HEADER_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_HEADER_SUBTYPE
+    .dw 0x1001           ; CDC 1.10
 
-; endpoint 1 in
+; call management
+    .db DSCR_CDC_CALL_MGMT_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_CALL_MGMT_SUBTYPE
+    .db 0x00             ; capabilities
+    .db 1                ; data interface
+
+; ACM
+    .db DSCR_CDC_ACM_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_ACM_SUBTYPE
+    .db 0x02             ; capabilities (line coding and state)
+
+; CDC union
+    .db DSCR_CDC_UNION_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_UNION_SUBTYPE
+    .db 0                ; master interface
+    .db 1                ; slave interface
+
+; ACM endpoint
     .db DSCR_ENDPOINT_LEN
     .db DSCR_ENDPOINT_TYPE
     .db 0x81                ;  ep1 dir=in and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x00                ; max packet LSB
-    .db 0x02                ; max packet size=512 bytes
-    .db 0x00                ; polling interval
+    .db ENDPOINT_TYPE_INT   ; type
+    .db 0x08                ; max packet LSB
+    .db 0x00                ; max packet size=8 bytes
+    .db 16                  ; polling interval
+
+; CDC data interface
+    .db DSCR_INTERFACE_LEN
+    .db DSCR_INTERFACE_TYPE
+    .db 1                ; index
+    .db 0                ; alt setting idx
+    .db 2                ; n endpoints
+    .db 0x0A             ; class (CDC data)
+    .db 0x00             ; subclass
+    .db 0x00             ; protocol
+    .db 0                ; string index
 
 ; endpoint 2 out
     .db DSCR_ENDPOINT_LEN
@@ -131,28 +171,10 @@ highspd_dscr_end:
     .db 0x02                ; max packet size=512 bytes
     .db 0x00                ; polling interval
 
-; endpoint 4 out
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x04                ;  ep4 dir=OUT and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x00                ; max packet LSB
-    .db 0x02                ; max packet size=512 bytes
-    .db 0x00                ; polling interval
-
 ; endpoint 6 in
     .db DSCR_ENDPOINT_LEN
     .db DSCR_ENDPOINT_TYPE
     .db 0x86                ;  ep6 dir=in and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x00                ; max packet LSB
-    .db 0x02                ; max packet size=512 bytes
-    .db 0x00                ; polling interval
-
-; endpoint 8 in
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x88                ;  ep8 dir=in and address
     .db ENDPOINT_TYPE_BULK  ; type
     .db 0x00                ; max packet LSB
     .db 0x02                ; max packet size=512 bytes
@@ -166,44 +188,73 @@ _fullspd_dscr:
     ; can't use .dw because byte order is different
     .db (fullspd_dscr_realend-_fullspd_dscr) % 256 ; total length of config lsb
     .db (fullspd_dscr_realend-_fullspd_dscr) / 256 ; total length of config msb
-    .db 1                                ; n interfaces
+    .db 2                                ; n interfaces
     .db 1                                ; config number
     .db 0                                ; config string
     .db 0x80                             ; attrs = bus powered, no wakeup
-    .db 0x32                             ; max power = 100ma
+    .db 0xfa                             ; max power = 500ma
 fullspd_dscr_end:
 
 ; all the interfaces next
 ; NOTE the default TRM actually has more alt interfaces
 ; but you can add them back in if you need them.
 ; here, we just use the default alt setting 1 from the trm
+; CDC control interface
     .db DSCR_INTERFACE_LEN
     .db DSCR_INTERFACE_TYPE
     .db 0                ; index
     .db 0                ; alt setting idx
-    .db 6                ; n endpoints
-    .db 0xff             ; class
-    .db 0xff
-    .db 0xff
+    .db 1                ; n endpoints
+    .db 0x02             ; class (CDC)
+    .db 0x02             ; subclass (ACM)
+    .db 0x01             ; protocol (AT)
     .db 0                ; string index
 
-; endpoint 1 out
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x01                ;  ep1 dir=out and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x40                ; max packet LSB
-    .db 0x00                ; max packet size=64 bytes
-    .db 0x00                ; polling interval
+; CDC header
+    .db DSCR_CDC_HEADER_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_HEADER_SUBTYPE
+    .dw 0x1001           ; CDC 1.1.0
 
-; endpoint 1 in
+; call management
+    .db DSCR_CDC_CALL_MGMT_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_CALL_MGMT_SUBTYPE
+    .db 0x00             ; capabilities
+    .db 1                ; data interface
+
+; ACM
+    .db DSCR_CDC_ACM_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_ACM_SUBTYPE
+    .db 0x02             ; capabilities (line coding and state)
+
+; CDC union
+    .db DSCR_CDC_UNION_LEN
+    .db DSCR_CDC_TYPE
+    .db DSCR_CDC_UNION_SUBTYPE
+    .db 0                ; master interface
+    .db 1                ; slave interface
+
+; ACM endpoint
     .db DSCR_ENDPOINT_LEN
     .db DSCR_ENDPOINT_TYPE
     .db 0x81                ;  ep1 dir=in and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x40                ; max packet LSB
-    .db 0x00                ; max packet size=64 bytes
-    .db 0x00                ; polling interval
+    .db ENDPOINT_TYPE_INT   ; type
+    .db 0x08                ; max packet LSB
+    .db 0x00                ; max packet size=8 bytes
+    .db 64                  ; polling interval
+
+; CDC data interface
+    .db DSCR_INTERFACE_LEN
+    .db DSCR_INTERFACE_TYPE
+    .db 1                ; index
+    .db 0                ; alt setting idx
+    .db 2                ; n endpoints
+    .db 0x0A             ; class (CDC data)
+    .db 0x00             ; subclass
+    .db 0x00             ; protocol
+    .db 0                ; string index
 
 ; endpoint 2 out
     .db DSCR_ENDPOINT_LEN
@@ -214,27 +265,10 @@ fullspd_dscr_end:
     .db 0x00                ; max packet size=64 bytes
     .db 0x00                ; polling interval
 
-; endpoint 4 out
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x04                ;  ep4 dir=OUT and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x40                ; max packet LSB
-    .db 0x00                ; max packet size=64 bytes
-    .db 0x00                ; polling interval
-
 ; endpoint 6 in
     .db DSCR_ENDPOINT_LEN
     .db DSCR_ENDPOINT_TYPE
     .db 0x86                ;  ep6 dir=in and address
-    .db ENDPOINT_TYPE_BULK  ; type
-    .db 0x40                ; max packet LSB
-    .db 0x00                ; max packet size=64 bytes
-    .db 0x00                ; polling interval
-; endpoint 6 in
-    .db DSCR_ENDPOINT_LEN
-    .db DSCR_ENDPOINT_TYPE
-    .db 0x88                ;  ep6 dir=in and address
     .db ENDPOINT_TYPE_BULK  ; type
     .db 0x40                ; max packet LSB
     .db 0x00                ; max packet size=64 bytes
