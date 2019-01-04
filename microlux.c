@@ -2,6 +2,8 @@
 #include <fx2macros.h>
 #include <setupdat.h>
 
+#define SYNCDELAY SYNCDELAY4
+
 volatile __bit dosud = FALSE;
 
 void main(void) {
@@ -14,6 +16,24 @@ void main(void) {
     ENABLE_SUDAV();
     ENABLE_USBRESET();
     ENABLE_HISPEED();
+
+    EP1INCFG = bmVALID | bmTYPE1 | bmTYPE0;
+    SYNCDELAY;
+
+    EP1OUTCFG &= ~bmVALID;
+    SYNCDELAY;
+
+    EP2CFG = bmVALID | bmTYPE1 | bmBUF1;
+    SYNCDELAY;
+
+    EP4CFG &= ~bmVALID;
+    SYNCDELAY;
+
+    EP6CFG = bmVALID | bmDIR | bmTYPE1 | bmBUF1;
+    SYNCDELAY;
+
+    EP8CFG &= ~bmVALID;
+    SYNCDELAY;
 
     EA = 1;
 
