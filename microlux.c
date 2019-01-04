@@ -73,6 +73,12 @@ void main(void) {
     EP8CFG &= ~bmVALID;
     SYNCDELAY;
 
+    /* arm EP2 */
+    EP2BCL = 0x80;
+    SYNCDELAY;
+    EP2BCL = 0x80;
+    SYNCDELAY;
+
     /* enable interrupts */
     EA = 1;
 
@@ -84,6 +90,11 @@ void main(void) {
 
         if (configured) {
             cdc_puts("Hello, world!\r\n");
+        }
+
+        while (!(EP2468STAT & bmEP2EMPTY)) {
+            EP2BCL = 0x80;
+            SYNCDELAY;
         }
     }
 }
@@ -142,6 +153,12 @@ BOOL handle_set_interface(BYTE ifc, BYTE alt_ifc) {
 
         /* reset EP2 */
         RESETTOGGLE(0x02);
+
+        EP2BCL = 0x80;
+        SYNCDELAY;
+        EP2BCL = 0x80;
+        SYNCDELAY;
+
         RESETFIFO(0x02);
 
         /* reset EP6 */
