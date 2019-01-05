@@ -1,3 +1,6 @@
+#include <delay.h>
+#include <fx2macros.h>
+
 #include "ar0130.h"
 #include "i2c.h"
 
@@ -39,4 +42,19 @@ static void ar0130_write(uint16_t reg, uint16_t value) {
         }
     };
     i2c_transfer(msgs, sizeof(msgs) / sizeof(msgs[0]));
+}
+
+void ar0130_init(void) {
+    /* set A0 (trigger) to output and set to low */
+    OEA |= bmBIT0;
+    IOA &= ~bmBIT0;
+}
+
+void ar0130_trigger(void) {
+    /* raise trigger for at least 3 cycles */
+    IOA |= bmBIT0;
+    NOP;
+    NOP;
+    NOP;
+    IOA &= ~bmBIT0;
 }

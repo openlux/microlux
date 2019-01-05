@@ -1,6 +1,7 @@
 #include <autovector.h>
 #include <fx2macros.h>
 
+#include "ar0130.h"
 #include "i2c.h"
 #include "usb.h"
 #include "usb_cdc.h"
@@ -17,6 +18,7 @@ void main(void) {
     IFCONFIG = bmIFCLKSRC | bm3048MHZ;
 
     i2c_init();
+    ar0130_init();
     usb_init();
 
     /* enable interrupts */
