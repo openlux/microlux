@@ -6,6 +6,9 @@
 #include "usb_cdc.h"
 
 void main(void) {
+    /* enable revision-specific features */
+    REVCTL = bmNOAUTOARM | bmSKIPCOMMIT;
+
     /* set CPU clock frequency to 48 MHz and enable CLKOUT */
     CPUCS = bmCLKSPD1 | bmCLKOE;
 

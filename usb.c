@@ -42,9 +42,10 @@ void usb_init(void) {
     SYNCDELAY;
 
     /* arm EP4 */
-    EP4BCL = 0x80;
+    OUTPKTEND = 0x84;
     SYNCDELAY;
-    EP4BCL = 0x80;
+
+    OUTPKTEND = 0x84;
     SYNCDELAY;
 }
 
@@ -95,9 +96,10 @@ bool handle_set_interface(uint8_t ifc, uint8_t alt_ifc) {
         /* reset EP4 */
         RESETTOGGLE(0x04);
 
-        EP4BCL = 0x80;
+        OUTPKTEND = 0x84;
         SYNCDELAY;
-        EP4BCL = 0x80;
+
+        OUTPKTEND = 0x84;
         SYNCDELAY;
 
         RESETFIFO(0x04);

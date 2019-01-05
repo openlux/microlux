@@ -45,7 +45,7 @@ bool usb_cdc_handle_command(uint8_t cmd) {
 
 void usb_cdc_tick(void) {
     while (!(EP2468STAT & bmEP4EMPTY)) {
-        EP4BCL = 0x80;
+        OUTPKTEND = 0x84;
         SYNCDELAY;
     }
 }
