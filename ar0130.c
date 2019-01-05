@@ -48,6 +48,12 @@ void ar0130_init(void) {
     /* set A0 (trigger) to output and set to low */
     OEA |= bmBIT0;
     IOA &= ~bmBIT0;
+
+    /* bypass the PLL */
+    ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
+
+    /* enable parallel interface and streaming mode */
+    ar0130_write(0x301A, ar0130_read(0x301A) | 0x0084);
 }
 
 void ar0130_trigger(void) {
