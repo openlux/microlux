@@ -29,22 +29,22 @@ void usb_init(void) {
     EP1OUTCFG &= ~bmVALID;
     SYNCDELAY;
 
-    EP2CFG = bmVALID | bmTYPE1 | bmBUF1;
+    EP2CFG &= ~bmVALID;
     SYNCDELAY;
 
-    EP4CFG &= ~bmVALID;
+    EP4CFG = bmVALID | bmTYPE1;
     SYNCDELAY;
 
-    EP6CFG = bmVALID | bmDIR | bmTYPE1 | bmBUF1;
+    EP6CFG &= ~bmVALID;
     SYNCDELAY;
 
-    EP8CFG &= ~bmVALID;
+    EP8CFG = bmVALID | bmDIR | bmTYPE1;
     SYNCDELAY;
 
-    /* arm EP2 */
-    EP2BCL = 0x80;
+    /* arm EP4 */
+    EP4BCL = 0x80;
     SYNCDELAY;
-    EP2BCL = 0x80;
+    EP4BCL = 0x80;
     SYNCDELAY;
 }
 
@@ -88,19 +88,19 @@ bool handle_set_interface(uint8_t ifc, uint8_t alt_ifc) {
         /* reset EP1 in */
         EP1INCS |= bmEPBUSY;
 
-        /* reset EP2 */
-        RESETTOGGLE(0x02);
+        /* reset EP4 */
+        RESETTOGGLE(0x04);
 
-        EP2BCL = 0x80;
+        EP4BCL = 0x80;
         SYNCDELAY;
-        EP2BCL = 0x80;
+        EP4BCL = 0x80;
         SYNCDELAY;
 
-        RESETFIFO(0x02);
+        RESETFIFO(0x04);
 
-        /* reset EP6 */
-        RESETTOGGLE(0x86);
-        RESETFIFO(0x06);
+        /* reset EP8 */
+        RESETTOGGLE(0x88);
+        RESETFIFO(0x08);
 
         return true;
     }

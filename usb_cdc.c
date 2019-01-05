@@ -44,23 +44,23 @@ bool usb_cdc_handle_command(uint8_t cmd) {
 }
 
 void usb_cdc_tick(void) {
-    while (!(EP2468STAT & bmEP2EMPTY)) {
-        EP2BCL = 0x80;
+    while (!(EP2468STAT & bmEP4EMPTY)) {
+        EP4BCL = 0x80;
         SYNCDELAY;
     }
 }
 
 void usb_cdc_puts(const char *str) {
-    /* wait for free space in EP6 */
-    while (EP2468STAT & bmEP6FULL);
+    /* wait for free space in EP8 */
+    while (EP2468STAT & bmEP8FULL);
 
-    /* write str to the EP6 FIFO */
-    strcpy(EP6FIFOBUF, str);
+    /* write str to the EP8 FIFO */
+    strcpy(EP8FIFOBUF, str);
 
     /* send the data to the host */
     size_t len = strlen(str);
-    EP6BCH = MSB(len);
+    EP8BCH = MSB(len);
     SYNCDELAY;
-    EP6BCL = LSB(len);
+    EP8BCL = LSB(len);
     SYNCDELAY;
 }
