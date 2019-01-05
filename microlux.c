@@ -6,8 +6,8 @@
 #include "usb_cdc.h"
 
 void main(void) {
-    /* set CPU clock frequency */
-    SETCPUFREQ(CLK_48M);
+    /* set CPU clock frequency to 48 MHz and enable CLKOUT */
+    CPUCS = bmCLKSPD1 | bmCLKOE;
 
     i2c_init();
     usb_init();
