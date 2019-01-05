@@ -3,6 +3,7 @@
 
 #include <delay.h>
 
-#define SYNCDELAY SYNCDELAY4
+/* IFCLK and CLKOUT are both 48 MHz */
+#define SYNCDELAY SYNCDELAY3
 
 #endif
