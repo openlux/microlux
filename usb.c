@@ -41,6 +41,9 @@ void usb_init(void) {
     EP8CFG = bmVALID | bmDIR | bmTYPE1;
     SYNCDELAY;
 
+    /* reset all FIFOs */
+    RESETFIFOS();
+
     /* arm EP4 */
     OUTPKTEND = 0x84;
     SYNCDELAY;
