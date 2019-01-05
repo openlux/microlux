@@ -68,7 +68,7 @@ _dev_dscr:
     .db 0x00                      ; protocol
     .db 64                        ; packet size (ep0)
     .dw 0x6666                    ; vendor id
-    .dw 0x3412                    ; product id
+    .dw 0x2707                    ; product id
     .dw 0x0001                    ; version id
     .db 1                         ; manufacturure str idx
     .db 2                         ; product str idx
