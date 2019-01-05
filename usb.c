@@ -29,7 +29,7 @@ void usb_init(void) {
     EP1OUTCFG &= ~bmVALID;
     SYNCDELAY;
 
-    EP2CFG &= ~bmVALID;
+    EP2CFG = bmVALID | bmDIR | bmTYPE1;
     SYNCDELAY;
 
     EP4CFG = bmVALID | bmTYPE1;
@@ -87,6 +87,10 @@ bool handle_set_interface(uint8_t ifc, uint8_t alt_ifc) {
     if (ifc == 0 && alt_ifc == 0) {
         /* reset EP1 in */
         EP1INCS |= bmEPBUSY;
+
+        /* reset EP2 */
+        RESETTOGGLE(0x82);
+        RESETFIFO(0x02);
 
         /* reset EP4 */
         RESETTOGGLE(0x04);

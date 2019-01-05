@@ -94,7 +94,7 @@ _highspd_dscr:
     ; can't use .dw because byte order is different
     .db (highspd_dscr_realend-_highspd_dscr) % 256 ; total length of config lsb
     .db (highspd_dscr_realend-_highspd_dscr) / 256 ; total length of config msb
-    .db 2                                ; n interfaces
+    .db 3                                ; n interfaces
     .db 1                                ; config number
     .db 0                                ; config string
     .db 0x80                             ; attrs = bus powered, no wakeup
@@ -179,6 +179,26 @@ highspd_dscr_end:
     .db 0x00                ; max packet LSB
     .db 0x02                ; max packet size=512 bytes
     .db 0x00                ; polling interval
+
+; camera interface
+    .db DSCR_INTERFACE_LEN
+    .db DSCR_INTERFACE_TYPE
+    .db 2                ; index
+    .db 0                ; alt setting idx
+    .db 1                ; n endpoints
+    .db 0xFF             ; class (vendor-specific)
+    .db 0x00             ; subclass
+    .db 0x00             ; protocol
+    .db 0                ; string index
+
+; endpoint 2 in
+    .db DSCR_ENDPOINT_LEN
+    .db DSCR_ENDPOINT_TYPE
+    .db 0x82                ; ep2 dir=in and address
+    .db ENDPOINT_TYPE_BULK  ; type
+    .db 0x00                ; max packet LSB
+    .db 0x02                ; max packet size=512 bytes
+    .db 0x00                ; polling interval
 highspd_dscr_realend:
 
 .even
@@ -188,7 +208,7 @@ _fullspd_dscr:
     ; can't use .dw because byte order is different
     .db (fullspd_dscr_realend-_fullspd_dscr) % 256 ; total length of config lsb
     .db (fullspd_dscr_realend-_fullspd_dscr) / 256 ; total length of config msb
-    .db 2                                ; n interfaces
+    .db 3                                ; n interfaces
     .db 1                                ; config number
     .db 0                                ; config string
     .db 0x80                             ; attrs = bus powered, no wakeup
@@ -269,6 +289,26 @@ fullspd_dscr_end:
     .db DSCR_ENDPOINT_LEN
     .db DSCR_ENDPOINT_TYPE
     .db 0x88                ;  ep8 dir=in and address
+    .db ENDPOINT_TYPE_BULK  ; type
+    .db 0x40                ; max packet LSB
+    .db 0x00                ; max packet size=64 bytes
+    .db 0x00                ; polling interval
+
+; camera interface
+    .db DSCR_INTERFACE_LEN
+    .db DSCR_INTERFACE_TYPE
+    .db 2                ; index
+    .db 0                ; alt setting idx
+    .db 1                ; n endpoints
+    .db 0xFF             ; class (vendor-specific)
+    .db 0x00             ; subclass
+    .db 0x00             ; protocol
+    .db 0                ; string index
+
+; endpoint 2 in
+    .db DSCR_ENDPOINT_LEN
+    .db DSCR_ENDPOINT_TYPE
+    .db 0x82                ; ep2 dir=in and address
     .db ENDPOINT_TYPE_BULK  ; type
     .db 0x40                ; max packet LSB
     .db 0x00                ; max packet size=64 bytes
