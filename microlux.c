@@ -17,8 +17,13 @@ void main(void) {
      * initializing the AR0130 chip) */
     IFCONFIG = bmIFCLKSRC | bm3048MHZ;
 
+    /* start external IFCLK */
     i2c_init();
     ar0130_init();
+
+    /* switch to external 48 MHz IFCLK */
+    IFCONFIG = 0;
+
     usb_init();
 
     /* enable interrupts */
