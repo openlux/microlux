@@ -9,6 +9,10 @@ void main(void) {
     /* set CPU clock frequency to 48 MHz and enable CLKOUT */
     CPUCS = bmCLKSPD1 | bmCLKOE;
 
+    /* enable internal 48 MHz IFCLK (we switch to the external IFCLK after
+     * initializing the AR0130 chip) */
+    IFCONFIG = bmIFCLKSRC | bm3048MHZ;
+
     i2c_init();
     usb_init();
 
