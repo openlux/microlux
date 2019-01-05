@@ -94,7 +94,17 @@ bool handle_set_interface(uint8_t ifc, uint8_t alt_ifc) {
 
         /* reset EP2 */
         RESETTOGGLE(0x82);
-        RESETFIFO(0x02);
+
+        FIFORESET = 0x80;
+        SYNCDELAY;
+        EP2FIFOCFG &= ~bmAUTOIN;
+        SYNCDELAY;
+        FIFORESET = 0x02;
+        SYNCDELAY;
+        EP2FIFOCFG |= bmAUTOIN;
+        SYNCDELAY;
+        FIFORESET = 0x00;
+        SYNCDELAY;
 
         /* reset EP4 */
         RESETTOGGLE(0x04);

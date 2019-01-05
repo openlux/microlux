@@ -5,6 +5,7 @@
 #include "i2c.h"
 #include "usb.h"
 #include "usb_cdc.h"
+#include "usb_fifo.h"
 
 void main(void) {
     /* enable revision-specific features */
@@ -25,6 +26,7 @@ void main(void) {
     IFCONFIG = 0;
 
     usb_init();
+    usb_fifo_init();
 
     /* enable interrupts */
     EA = 1;
