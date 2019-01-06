@@ -1,8 +1,11 @@
 #include <delay.h>
+#include <fx2ints.h>
 #include <fx2macros.h>
 
 #include "ar0130.h"
 #include "i2c.h"
+#include "usb.h"
+#include "usb_fifo.h"
 
 #define AR0130_ADDR 0x20
 
@@ -50,4 +53,14 @@ void ar0130_init(void) {
 
     /* enable parallel interface and streaming mode */
     ar0130_write(0x301A, ar0130_read(0x301A) | 0x0084);
+
+    /* enable interrupts on FRAME_VALID falling edge */
+    EX1 = 1;
+    IT1 = 1;
+}
+
+void int1_isr(void) __interrupt IE1_ISR {
+    if (usb_configured) {
+        usb_fifo_flush();
+    }
 }

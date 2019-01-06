@@ -31,3 +31,8 @@ void usb_fifo_init(void) {
     EP2AUTOINLENL = 0x00;
     SYNCDELAY;
 }
+
+void usb_fifo_flush(void) {
+    INPKTEND = 0x02;
+    SYNCDELAY;
+}
