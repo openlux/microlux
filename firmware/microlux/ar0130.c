@@ -53,14 +53,5 @@ void ar0130_init(void) {
 
     /* enable parallel interface and streaming mode */
     ar0130_write(0x301A, ar0130_read(0x301A) | 0x0084);
-
-    /* enable interrupts on FRAME_VALID falling edge */
-    EX1 = 1;
-    IT1 = 1;
 }
 
-void int1_isr(void) __interrupt IE1_ISR {
-    if (usb_configured) {
-        usb_fifo_flush();
-    }
-}
