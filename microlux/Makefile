@@ -1,4 +1,4 @@
-FX2LIB=/home/gpe/code/fx2lib
+FX2LIB=../fx2lib
 
 SOURCES=ar0130.c i2c.c microlux.c uitoa.c usb.c usb_cdc.c usb_fifo.c
 A51_SOURCES=dscr.a51
