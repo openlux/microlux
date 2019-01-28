@@ -1,5 +1,7 @@
 .*
 *~
-/build
+/firmware/microlux/build
 !.git*
 !.mailmap
+*.sw*
+.gitignore~
