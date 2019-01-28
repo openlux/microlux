@@ -11,8 +11,8 @@ void main(void) {
     /* enable revision-specific features */
     REVCTL = bmNOAUTOARM | bmSKIPCOMMIT;
 
-    /* set CPU clock frequency to 48 MHz and enable CLKOUT */
-    CPUCS = bmCLKSPD1 | bmCLKOE;
+    /* set CPU clock frequency to 12 MHz and enable CLKOUT */
+    CPUCS = bmCLKOE;
 
     /* enable internal 48 MHz IFCLK (we switch to the external IFCLK after
      * initializing the AR0130 chip) */
