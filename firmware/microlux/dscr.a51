@@ -72,7 +72,7 @@ _dev_dscr:
     .dw 0x0001                    ; version id
     .db 1                         ; manufacturure str idx
     .db 2                         ; product str idx
-    .db 0                         ; serial str idx
+    .db 3                         ; serial str idx
     .db 1                         ; n configurations
 dev_dscr_end:
 
@@ -363,6 +363,28 @@ _string2:
     .ascii 'x'
     .db 0
 string2end:
+
+_string3:
+    .db string3end-_string3 ; len
+    .db DSCR_STRING_TYPE
+    .ascii 'A'
+    .db 0
+    .ascii '5'
+    .db 0
+    .ascii '3'
+    .db 0
+    .ascii 'B'
+    .db 0
+    .ascii 'F'
+    .db 0
+    .ascii '6'
+    .db 0
+    .ascii '0'
+    .db 0
+    .ascii '9'
+    .db 0
+string3end:
+
 ; add more strings here
 
 
