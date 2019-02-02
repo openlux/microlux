@@ -33,7 +33,7 @@ bool usb_cdc_handle_command(uint8_t cmd) {
             EP0BCH = MSB(len);
             EP0BCL = LSB(len);
             SUDPTRH = MSB(&cdc_line_coding);
-            SUDPTRL = MSB(&cdc_line_coding);
+            SUDPTRL = LSB(&cdc_line_coding);
             SUDPTRCTL |= bmSDPAUTO;
             return true;
         case CDC_SET_CONTROL_LINE_STATE:
