@@ -24,9 +24,9 @@ bool usb_cdc_handle_command(uint8_t cmd) {
     size_t len = sizeof(cdc_line_coding);
     switch (cmd) {
         case CDC_SET_LINE_CODING:
+            EP0BCL = 0;
             while (EP0BCL < len);
             memcpy(&cdc_line_coding, EP0BUF, len);
-            EP0BCL = 0;
             return true;
         case CDC_GET_LINE_CODING:
             SUDPTRCTL &= ~bmSDPAUTO;
