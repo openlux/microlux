@@ -120,4 +120,3 @@ void ar0130_init(void) {
     /* restart */
     //ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
 }
-
