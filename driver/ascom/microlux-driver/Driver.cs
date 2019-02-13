@@ -253,7 +253,7 @@ namespace ASCOM.microlux
         public void AbortExposure()
         {
             tl.LogMessage("AbortExposure", "Not implemented");
-            throw new MethodNotImplementedException("AbortExposure");
+            StopExposure();
         }
 
         public object ImageArray
