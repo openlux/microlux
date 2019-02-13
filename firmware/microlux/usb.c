@@ -65,7 +65,7 @@ bool handle_get_descriptor() {
 }
 
 bool handle_vendorcommand(uint8_t cmd) {
-    if (SETUPDAT[0] == 0x41) {
+    if (SETUP_TYPE == 0x41) {
         return ar0130_handle_command(cmd);
     } else {
         return usb_cdc_handle_command(cmd);
