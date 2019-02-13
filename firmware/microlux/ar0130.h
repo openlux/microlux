@@ -19,5 +19,6 @@ struct ar0130_exposure_config {
 
 void ar0130_init(void);
 void ar0130_start_exposure(struct ar0130_exposure_config *new_config);
+void ar0130_stop_exposure(void);
 
 #endif

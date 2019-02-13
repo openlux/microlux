@@ -50,8 +50,8 @@ void ar0130_init(void) {
     /* bypass the PLL */
     ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
 
-    /* enable mask_bad, parallel interface, stdby_eof and streaming mode */
-    ar0130_write(0x301A, ar0130_read(0x301A) | 0x0294);
+    /* enable mask_bad, parallel interface and stdby_eof */
+    ar0130_write(0x301A, ar0130_read(0x301A) | 0x0290);
 }
 
 void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
@@ -72,7 +72,15 @@ void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
 
     memcpy(&exposure_config, new_config, sizeof(exposure_config));
 
+    uint16_t flags = 0x0004;
+
     if (reset) {
-        ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
+        flags |= 0x0002;
     }
+
+    ar0130_write(0x301A, ar0130_read(0x301A) | flags);
+}
+
+void ar0130_stop_exposure(void) {
+    ar0130_write(0x301A, (ar0130_read(0x301A) & ~0x0004) | 0x0002);
 }

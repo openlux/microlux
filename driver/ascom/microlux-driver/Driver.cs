@@ -122,7 +122,7 @@ namespace ASCOM.microlux
 
                     microlux.Connect();
 
-                    microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, 0x40, 0xA8, 100, 0, 1430);
+                    microlux.StartExposure(startX, startX + width + 3, startY + 2, startY + height + 5, 0x40, 0xA8, 100, 0, 1430);
 
                     connectedState = true;
                     LogMessage("Connected Set", "Connecting to port {0}", serialNumber);
@@ -239,7 +239,7 @@ namespace ASCOM.microlux
             var exposureFine = 0;
             var lineWidth = 1430;
 
-            microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, gain, OFFSET, exposureCoarse, exposureFine, lineWidth);
+            microlux.StartExposure(startX, startX + width + 3, startY + 2, startY + height + 5, gain, OFFSET, exposureCoarse, exposureFine, lineWidth);
 
             cameraImageReady = true;
         }
@@ -247,7 +247,7 @@ namespace ASCOM.microlux
         public void StopExposure()
         {
             tl.LogMessage("StopExposure", "Not implemented");
-            throw new MethodNotImplementedException("StopExposure");
+            microlux.StopExposure();
         }
 
         public void AbortExposure()

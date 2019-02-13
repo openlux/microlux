@@ -76,7 +76,7 @@ namespace ASCOM.microlux
             new Thread(TransferThread).Start();
         }
 
-        public void WriteExposureMessage(int startX, int endX, int startY, int endY, int gain, int offset, int exposureCoarse, int exposureFine, int lineLength)
+        public void StartExposure(int startX, int endX, int startY, int endY, int gain, int offset, int exposureCoarse, int exposureFine, int lineLength)
         {
             byte[] data = new byte[16];
             var wrap = new BinaryWriter(new MemoryStream(data));
@@ -99,6 +99,11 @@ namespace ASCOM.microlux
             wrap.Write((short)lineLength);
 
             device.ControlOut(0x41, 0x80, 0, 2, data);
+        }
+
+        public void StopExposure()
+        {
+            device.ControlOut(0x41, 0x81, 0, 2);
         }
 
         public int[,] ReadFrame()
