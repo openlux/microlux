@@ -12,10 +12,10 @@
 
 #define AR0130_ADDR 0x20
 
-#define SET_REGISTER 0x80
-#define CTRL_EXPOSURE 0x80
+#define AR0130_SET_REGISTER 0x80
+#define AR0130_CTRL_EXPOSURE 0x80
 
-struct exposure_config exposure_config;
+struct ar0130_exposure_config exposure_config;
 
 static uint16_t ar0130_read(uint16_t reg) {
     uint8_t buf[] = {
@@ -55,7 +55,7 @@ static void ar0130_write(uint16_t reg, uint16_t value) {
     i2c_transfer(msgs, sizeof(msgs) / sizeof(msgs[0]));
 }
 
-static void start_exposure(struct exposure_config *new_config) {
+static void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
     bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
     ar0130_write(0x3004, new_config->x_start);
@@ -103,9 +103,9 @@ void ar0130_init(void) {
     //ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
 }
 
-bool camera_handle_command(uint8_t cmd) {
-    if (cmd == CTRL_EXPOSURE) {
-        struct exposure_config new_config;
+bool ar0130_handle_command(uint8_t cmd) {
+    if (cmd == AR0130_CTRL_EXPOSURE) {
+        struct ar0130_exposure_config new_config;
         size_t len = sizeof(new_config);
 
         EP0BCL = 0;
@@ -113,7 +113,7 @@ bool camera_handle_command(uint8_t cmd) {
 
         memcpy(&new_config, EP0BUF, len);
 
-        start_exposure(&new_config);
+        ar0130_start_exposure(&new_config);
 
         return true;
     }

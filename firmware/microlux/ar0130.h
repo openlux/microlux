@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct exposure_config {
+struct ar0130_exposure_config {
     uint16_t x_start;
     uint16_t x_end;
     uint16_t y_start;
@@ -19,6 +19,6 @@ struct exposure_config {
 };
 
 void ar0130_init(void);
-bool camera_handle_command(uint8_t cmd);
+bool ar0130_handle_command(uint8_t cmd);
 
 #endif
