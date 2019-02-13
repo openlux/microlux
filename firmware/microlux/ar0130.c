@@ -77,24 +77,6 @@ static void start_exposure(struct exposure_config *new_config) {
     }
 }
 
-bool camera_handle_command(uint8_t cmd) {
-    if (cmd == CTRL_EXPOSURE) {
-        struct exposure_config new_config;
-        size_t len = sizeof(new_config);
-
-        EP0BCL = 0;
-        while (EP0BCL < len);
-
-        memcpy(&new_config, EP0BUF, len);
-
-        start_exposure(&new_config);
-
-        return true;
-    }
-
-    return false;
-}
-
 void ar0130_init(void) {
     /* bypass the PLL */
     ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
@@ -119,4 +101,22 @@ void ar0130_init(void) {
 
     /* restart */
     //ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
+}
+
+bool camera_handle_command(uint8_t cmd) {
+    if (cmd == CTRL_EXPOSURE) {
+        struct exposure_config new_config;
+        size_t len = sizeof(new_config);
+
+        EP0BCL = 0;
+        while (EP0BCL < len);
+
+        memcpy(&new_config, EP0BUF, len);
+
+        start_exposure(&new_config);
+
+        return true;
+    }
+
+    return false;
 }

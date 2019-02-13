@@ -18,7 +18,7 @@ struct exposure_config {
     uint16_t line_width;
 };
 
-bool camera_handle_command(uint8_t cmd);
 void ar0130_init(void);
+bool camera_handle_command(uint8_t cmd);
 
 #endif
