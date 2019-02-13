@@ -20,7 +20,6 @@ struct exposure_config {
 
 bool camera_handle_command(uint8_t cmd);
 void start_exposure(struct exposure_config *new_config);
-bool compare_config(struct exposure_config *new_config);
 void ar0130_init(void);
 
 #endif

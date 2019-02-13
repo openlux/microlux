@@ -74,7 +74,7 @@ bool camera_handle_command(uint8_t cmd) {
 }
 
 void start_exposure(struct exposure_config *new_config) {
-    bool reset = compare_config(new_config);
+    bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
     ar0130_write(0x3004, new_config->x_start);
     ar0130_write(0x3008, new_config->x_end);
@@ -93,24 +93,6 @@ void start_exposure(struct exposure_config *new_config) {
     if (reset) {
         ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
     }
-}
-
-bool compare_config(struct exposure_config *new_config) {
-    bool reset = false;
-
-    if (new_config->x_start != exposure_config.x_start) reset = true;
-    if (new_config->x_end   != exposure_config.x_end  ) reset = true;
-    if (new_config->y_start != exposure_config.y_start) reset = true;
-    if (new_config->y_end   != exposure_config.y_end  ) reset = true;
-
-    if (new_config->gain   != exposure_config.gain  ) reset = true;
-    if (new_config->offset != exposure_config.offset) reset = true;
-
-    if (new_config->duration_coarse != exposure_config.duration_coarse) reset = true;
-    if (new_config->duration_fine   != exposure_config.duration_fine  ) reset = true;
-    if (new_config->line_width      != exposure_config.line_width     ) reset = true;
-
-    return reset;
 }
 
 void ar0130_init(void) {
