@@ -240,7 +240,6 @@ namespace ASCOM.microlux
             var lineWidth = 1430;
 
             microlux.StartExposure(startX, startX + width + 3, startY + 2, startY + height + 5, gain, OFFSET, exposureCoarse, exposureFine, lineWidth);
-
             cameraImageReady = true;
         }
 
@@ -248,6 +247,7 @@ namespace ASCOM.microlux
         {
             tl.LogMessage("StopExposure", "Not implemented");
             microlux.StopExposure();
+            cameraImageReady = false;
         }
 
         public void AbortExposure()
