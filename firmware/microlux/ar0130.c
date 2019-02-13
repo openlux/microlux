@@ -1,14 +1,8 @@
-#include <delay.h>
-#include <fx2ints.h>
-#include <fx2macros.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 
 #include "ar0130.h"
 #include "i2c.h"
-#include "usb.h"
-#include "usb_fifo.h"
 
 #define AR0130_ADDR 0x20
 
