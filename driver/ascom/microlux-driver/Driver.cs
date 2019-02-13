@@ -13,14 +13,14 @@ namespace ASCOM.microlux
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ICameraV2
     {
-        private static readonly string driverID = "ASCOM.microlux.Camera";
-        private static readonly string driverDescription = "microlux";
+        private const string DRIVER_ID = "ASCOM.microlux.Camera";
+        private const string DRIVER_NAME = "microlux";
 
-        private static readonly string serialNumberProfileName = "Serial Number";
-        private static readonly string serialNumberDefault = string.Empty;
+        private const string SERIAL_NUMBER_PROFILE_NAME = "Serial Number";
+        private const string SERIAL_NUMBER_DEFAULT = "";
 
-        private static readonly string traceStateProfileName = "Trace Level";
-        private static readonly string traceStateDefault = "false";
+        private const string TRACE_STATE_PROFILE_NAME = "Trace Level";
+        private const string TRACE_STATE_DEFAULT = "false";
 
         internal static string serialNumber = string.Empty;
         internal static TraceLogger tl;
@@ -144,8 +144,8 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("Description Get", driverDescription);
-                return driverDescription;
+                tl.LogMessage("Description Get", DRIVER_NAME);
+                return DRIVER_NAME;
             }
         }
 
@@ -785,11 +785,11 @@ namespace ASCOM.microlux
                 P.DeviceType = "Camera";
                 if (bRegister)
                 {
-                    P.Register(driverID, driverDescription);
+                    P.Register(DRIVER_ID, DRIVER_NAME);
                 }
                 else
                 {
-                    P.Unregister(driverID);
+                    P.Unregister(DRIVER_ID);
                 }
             }
         }
@@ -830,8 +830,8 @@ namespace ASCOM.microlux
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Camera";
-                tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                serialNumber = driverProfile.GetValue(driverID, serialNumberProfileName, string.Empty, serialNumberDefault);
+                tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(DRIVER_ID, TRACE_STATE_PROFILE_NAME, string.Empty, TRACE_STATE_DEFAULT));
+                serialNumber = driverProfile.GetValue(DRIVER_ID, SERIAL_NUMBER_PROFILE_NAME, string.Empty, SERIAL_NUMBER_DEFAULT);
             }
         }
 
@@ -840,8 +840,8 @@ namespace ASCOM.microlux
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Camera";
-                driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
-                driverProfile.WriteValue(driverID, serialNumberProfileName, serialNumber);
+                driverProfile.WriteValue(DRIVER_ID, TRACE_STATE_PROFILE_NAME, tl.Enabled.ToString());
+                driverProfile.WriteValue(DRIVER_ID, SERIAL_NUMBER_PROFILE_NAME, serialNumber);
             }
         }
 
