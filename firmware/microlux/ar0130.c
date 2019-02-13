@@ -12,22 +12,6 @@
 
 #define AR0130_ADDR 0x20
 
-#define AR0130_CTRL_EXPOSURE 0x80
-
-struct ar0130_exposure_config {
-    uint16_t x_start;
-    uint16_t x_end;
-    uint16_t y_start;
-    uint16_t y_end;
-
-    uint8_t gain;
-    uint8_t offset;
-
-    uint16_t duration_coarse;
-    uint16_t duration_fine;
-    uint16_t line_width;
-};
-
 struct ar0130_exposure_config exposure_config;
 
 static uint16_t ar0130_read(uint16_t reg) {
@@ -68,7 +52,15 @@ static void ar0130_write(uint16_t reg, uint16_t value) {
     i2c_transfer(msgs, sizeof(msgs) / sizeof(msgs[0]));
 }
 
-static void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
+void ar0130_init(void) {
+    /* bypass the PLL */
+    ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
+
+    /* enable mask_bad, parallel interface, stdby_eof and streaming mode */
+    ar0130_write(0x301A, ar0130_read(0x301A) | 0x0294);
+}
+
+void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
     /* using memcmp() is fine here as structs are packed by default in sdcc */
     bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
@@ -89,30 +81,4 @@ static void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
     if (reset) {
         ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
     }
-}
-
-void ar0130_init(void) {
-    /* bypass the PLL */
-    ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
-
-    /* enable mask_bad, parallel interface, stdby_eof and streaming mode */
-    ar0130_write(0x301A, ar0130_read(0x301A) | 0x0294);
-}
-
-bool ar0130_handle_command(uint8_t cmd) {
-    if (cmd == AR0130_CTRL_EXPOSURE) {
-        struct ar0130_exposure_config new_config;
-        size_t len = sizeof(new_config);
-
-        EP0BCL = 0;
-        while (EP0BCL < len);
-
-        memcpy(&new_config, EP0BUF, len);
-
-        ar0130_start_exposure(&new_config);
-
-        return true;
-    }
-
-    return false;
 }

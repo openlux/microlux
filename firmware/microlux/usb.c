@@ -3,9 +3,9 @@
 #include <fx2macros.h>
 #include <setupdat.h>
 
-#include "ar0130.h"
 #include "microlux.h"
 #include "usb.h"
+#include "usb_ar0130.h"
 #include "usb_cdc.h"
 
 volatile bool usb_configured = false;
@@ -65,7 +65,7 @@ bool handle_get_descriptor() {
 }
 
 bool handle_vendorcommand(uint8_t cmd) {
-    return ar0130_handle_command(cmd) || usb_cdc_handle_command(cmd);
+    return usb_ar0130_handle_command(cmd) || usb_cdc_handle_command(cmd);
 }
 
 uint8_t handle_get_configuration(void) {
