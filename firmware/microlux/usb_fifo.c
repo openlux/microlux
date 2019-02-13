@@ -19,8 +19,8 @@ void usb_fifo_init(void) {
     FIFOINPOLAR = bmSLOE | bmSLWR;
     SYNCDELAY;
 
-    /* bypass CPU on EP2 IN, enable ZLPs and set FIFO width to 16 bits */
-    EP2FIFOCFG = bmAUTOIN | bmZEROLENIN | bmWORDWIDE;
+    /* bypass CPU on EP2 IN and set FIFO width to 16 bits */
+    EP2FIFOCFG = bmAUTOIN | bmWORDWIDE;
     SYNCDELAY;
 
     /* set auto-read length to 512 bytes (TODO: set to 64 bytes in full speed
