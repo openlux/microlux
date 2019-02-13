@@ -55,25 +55,7 @@ static void ar0130_write(uint16_t reg, uint16_t value) {
     i2c_transfer(msgs, sizeof(msgs) / sizeof(msgs[0]));
 }
 
-bool camera_handle_command(uint8_t cmd) {
-    if (cmd == CTRL_EXPOSURE) {
-        struct exposure_config new_config;
-        size_t len = sizeof(new_config);
-
-        EP0BCL = 0;
-        while (EP0BCL < len);
-
-        memcpy(&new_config, EP0BUF, len);
-
-        start_exposure(&new_config);
-
-        return true;
-    }
-
-    return false;
-}
-
-void start_exposure(struct exposure_config *new_config) {
+static void start_exposure(struct exposure_config *new_config) {
     bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
     ar0130_write(0x3004, new_config->x_start);
@@ -93,6 +75,24 @@ void start_exposure(struct exposure_config *new_config) {
     if (reset) {
         ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
     }
+}
+
+bool camera_handle_command(uint8_t cmd) {
+    if (cmd == CTRL_EXPOSURE) {
+        struct exposure_config new_config;
+        size_t len = sizeof(new_config);
+
+        EP0BCL = 0;
+        while (EP0BCL < len);
+
+        memcpy(&new_config, EP0BUF, len);
+
+        start_exposure(&new_config);
+
+        return true;
+    }
+
+    return false;
 }
 
 void ar0130_init(void) {
