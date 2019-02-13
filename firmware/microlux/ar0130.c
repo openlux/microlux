@@ -14,6 +14,20 @@
 
 #define AR0130_CTRL_EXPOSURE 0x80
 
+struct ar0130_exposure_config {
+    uint16_t x_start;
+    uint16_t x_end;
+    uint16_t y_start;
+    uint16_t y_end;
+
+    uint8_t gain;
+    uint8_t offset;
+
+    uint16_t duration_coarse;
+    uint16_t duration_fine;
+    uint16_t line_width;
+};
+
 struct ar0130_exposure_config exposure_config;
 
 static uint16_t ar0130_read(uint16_t reg) {
