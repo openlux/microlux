@@ -1,7 +1,14 @@
 .*
 *~
 /firmware/microlux/build
+/driver/ascom/microlux-driver/bin
+/driver/ascom/microlux-driver/lib
+/driver/ascom/microlux-driver/obj
 !.git*
 !.mailmap
 *.sw*
+*.suo
+*.user
+*.sln.docstates
+**/packages
 .gitignore~
