@@ -3,10 +3,10 @@
 #include <fx2macros.h>
 #include <setupdat.h>
 
+#include "ar0130.h"
 #include "microlux.h"
 #include "usb.h"
 #include "usb_cdc.h"
-#include "ar0130.h"
 
 volatile bool usb_configured = false;
 static volatile __bit dosud = false;
