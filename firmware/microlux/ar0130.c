@@ -69,6 +69,7 @@ static void ar0130_write(uint16_t reg, uint16_t value) {
 }
 
 static void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
+    /* using memcmp() is fine here as structs are packed by default in sdcc */
     bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
     ar0130_write(0x3004, new_config->x_start);
