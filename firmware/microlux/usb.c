@@ -6,6 +6,7 @@
 #include "microlux.h"
 #include "usb.h"
 #include "usb_cdc.h"
+#include "ar0130.h"
 
 volatile bool usb_configured = false;
 static volatile __bit dosud = false;
@@ -64,7 +65,11 @@ bool handle_get_descriptor() {
 }
 
 bool handle_vendorcommand(uint8_t cmd) {
-    return usb_cdc_handle_command(cmd);
+    if (SETUPDAT[0] == 0x41) {
+        return camera_handle_command(cmd);
+    } else {
+        return usb_cdc_handle_command(cmd);
+    }
 }
 
 uint8_t handle_get_configuration(void) {
