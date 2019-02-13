@@ -96,24 +96,6 @@ void ar0130_init(void) {
 
     /* enable parallel interface and standby_eof */
     ar0130_write(0x301A, ar0130_read(0x301A) | 0x0294);
-
-    /* enable parallel interface and streaming mode */
-    //ar0130_write(0x301A, ar0130_read(0x301A) | 0x0084);
-
-    // 0x3002 = y start, 0x3006 = y end (inc), 0x3004 = x start, 0x3008 = x end (inc), 0x3032 = binning
-
-    /* line width */
-    //ar0130_write(0x300C, 65535);
-
-    /* exposure time */
-    //ar0130_write(0x3012, 100); // coarse (lines)
-    //ar0130_write(0x3014, 0); // fine (pixels)
-
-    /* gain, max=255?, 0x301E = offset */
-    //ar0130_write(0x305E, 127);
-
-    /* restart */
-    //ar0130_write(0x301A, ar0130_read(0x301A) | 0x0002);
 }
 
 bool ar0130_handle_command(uint8_t cmd) {
