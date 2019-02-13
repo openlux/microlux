@@ -95,7 +95,7 @@ void ar0130_init(void) {
     /* bypass the PLL */
     ar0130_write(0x30B0, ar0130_read(0x30B0) | 0x4000);
 
-    /* enable parallel interface and standby_eof */
+    /* enable mask_bad, parallel interface, stdby_eof and streaming mode */
     ar0130_write(0x301A, ar0130_read(0x301A) | 0x0294);
 }
 
