@@ -199,13 +199,14 @@ namespace ASCOM.microlux
         private const int MAX_WIDTH = 1280;
         private const int MAX_HEIGHT = 960;
 
+        private const int OFFSET = 0xA8;
+
         private int width = MAX_WIDTH;
         private int height = MAX_HEIGHT;
         private int startX = 0;
         private int startY = 0;
 
         private int gain = 0x20;
-        private int offset = 0xA8;
 
         private DateTime exposureStart = DateTime.MinValue;
         private double cameraLastExposureDuration = 0.0;
@@ -238,7 +239,7 @@ namespace ASCOM.microlux
             var exposureFine = 0;
             var lineWidth = 1430;
 
-            microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, gain, offset, exposureCoarse, exposureFine, lineWidth);
+            microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, gain, OFFSET, exposureCoarse, exposureFine, lineWidth);
 
             cameraImageReady = true;
         }
