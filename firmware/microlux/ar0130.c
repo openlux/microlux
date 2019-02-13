@@ -12,7 +12,6 @@
 
 #define AR0130_ADDR 0x20
 
-#define AR0130_SET_REGISTER 0x80
 #define AR0130_CTRL_EXPOSURE 0x80
 
 struct ar0130_exposure_config exposure_config;
