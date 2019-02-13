@@ -122,7 +122,7 @@ namespace ASCOM.microlux
 
                     microlux.Connect();
 
-                    microlux.WriteExposureMessage(cameraStartX, cameraStartX + cameraNumX + 3, cameraStartY + 2, cameraStartY + cameraNumY + 5, 0x40, 0xA8, 100, 0, 1430);
+                    microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, 0x40, 0xA8, 100, 0, 1430);
 
                     connectedState = true;
                     LogMessage("Connected Set", "Connecting to port {0}", serialNumber);
@@ -194,20 +194,22 @@ namespace ASCOM.microlux
 
         #region ICamera Implementation
 
-        private const int ccdWidth = 1280;
-        private const int ccdHeight = 960;
-        private const double pixelSize = 3.75;
+        private const double PIXEL_SIZE = 3.75;
 
-        private int cameraGain = 0x20;
+        private const int MAX_WIDTH = 1280;
+        private const int MAX_HEIGHT = 960;
 
-        private int cameraNumX = ccdWidth;
-        private int cameraNumY = ccdHeight;
-        private int cameraStartX = 0;
-        private int cameraStartY = 0;
+        private int width = MAX_WIDTH;
+        private int height = MAX_HEIGHT;
+        private int startX = 0;
+        private int startY = 0;
+
+        private int gain = 0x20;
+        private int offset = 0xA8;
+
         private DateTime exposureStart = DateTime.MinValue;
         private double cameraLastExposureDuration = 0.0;
         private bool cameraImageReady = false;
-        private int[,] cameraImageArray;
 
         public CameraStates CameraState
         {
@@ -221,11 +223,11 @@ namespace ASCOM.microlux
         public void StartExposure(double Duration, bool Light)
         {
             if (Duration < 0.0) throw new InvalidValueException("StartExposure", Duration.ToString(), "0.0 upwards");
-            if (cameraNumX > ccdWidth) throw new InvalidValueException("StartExposure", cameraNumX.ToString(), ccdWidth.ToString());
-            if (cameraNumY > ccdHeight) throw new InvalidValueException("StartExposure", cameraNumY.ToString(), ccdHeight.ToString());
-            if (cameraStartX > ccdWidth) throw new InvalidValueException("StartExposure", cameraStartX.ToString(), ccdWidth.ToString());
-            if (cameraStartY > ccdHeight) throw new InvalidValueException("StartExposure", cameraStartY.ToString(), ccdHeight.ToString());
-            if (cameraNumX < 64 || cameraNumY < 64) throw new InvalidValueException("StartExposure", cameraNumX.ToString(), cameraNumY.ToString());
+            if (width > MAX_WIDTH) throw new InvalidValueException("StartExposure", width.ToString(), MAX_WIDTH.ToString());
+            if (height > MAX_HEIGHT) throw new InvalidValueException("StartExposure", height.ToString(), MAX_HEIGHT.ToString());
+            if (startX > MAX_WIDTH) throw new InvalidValueException("StartExposure", startX.ToString(), MAX_WIDTH.ToString());
+            if (startY > MAX_HEIGHT) throw new InvalidValueException("StartExposure", startY.ToString(), MAX_HEIGHT.ToString());
+            if (width < 64 || height < 64) throw new InvalidValueException("StartExposure", width.ToString(), height.ToString());
 
             cameraLastExposureDuration = Duration;
             exposureStart = DateTime.Now;
@@ -233,8 +235,11 @@ namespace ASCOM.microlux
             tl.LogMessage("StartExposure", Duration.ToString() + " " + Light.ToString());
 
             var exposureCoarse = (int) (Duration / 0.00011916666d);
-            microlux.WriteExposureMessage(cameraStartX, cameraStartX + cameraNumX + 3, cameraStartY + 2, cameraStartY + cameraNumY + 5, cameraGain/*0x40*/, 0xA8, exposureCoarse/*400*/, 0, 1430);
-            cameraImageArray = microlux.ReadFrame();
+            var exposureFine = 0;
+            var lineWidth = 1430;
+
+            microlux.WriteExposureMessage(startX, startX + width + 3, startY + 2, startY + height + 5, gain, offset, exposureCoarse, exposureFine, lineWidth);
+
             cameraImageReady = true;
         }
 
@@ -262,11 +267,11 @@ namespace ASCOM.microlux
 
                 var cameraImageArray = microlux.ReadFrame();
 
-                var frame = new int[cameraNumX, cameraNumY];
+                var frame = new int[width, height];
 
-                for (var x = 0; x < cameraNumX; x++)
+                for (var x = 0; x < width; x++)
                 {
-                    for (var y = 0; y < cameraNumY; y++)
+                    for (var y = 0; y < height; y++)
                     {
                         frame[x, y] = cameraImageArray[x + 2, y + 4];
                     }
@@ -351,8 +356,8 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("CameraXSize Get", ccdWidth.ToString());
-                return ccdWidth;
+                tl.LogMessage("CameraXSize Get", MAX_WIDTH.ToString());
+                return MAX_WIDTH;
             }
         }
 
@@ -360,8 +365,8 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("CameraYSize Get", ccdHeight.ToString());
-                return ccdHeight;
+                tl.LogMessage("CameraYSize Get", MAX_HEIGHT.ToString());
+                return MAX_HEIGHT;
             }
         }
 
@@ -369,8 +374,8 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("PixelSizeX Get", pixelSize.ToString());
-                return pixelSize;
+                tl.LogMessage("PixelSizeX Get", PIXEL_SIZE.ToString());
+                return PIXEL_SIZE;
             }
         }
 
@@ -378,8 +383,8 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("PixelSizeY Get", pixelSize.ToString());
-                return pixelSize;
+                tl.LogMessage("PixelSizeY Get", PIXEL_SIZE.ToString());
+                return PIXEL_SIZE;
             }
         }
 
@@ -387,12 +392,12 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("StartX Get", cameraStartX.ToString());
-                return cameraStartX;
+                tl.LogMessage("StartX Get", startX.ToString());
+                return startX;
             }
             set
             {
-                cameraStartX = value;
+                startX = value;
                 tl.LogMessage("StartX Set", value.ToString());
             }
         }
@@ -401,12 +406,12 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("StartY Get", cameraStartY.ToString());
-                return cameraStartY;
+                tl.LogMessage("StartY Get", startY.ToString());
+                return startY;
             }
             set
             {
-                cameraStartY = value;
+                startY = value;
                 tl.LogMessage("StartY set", value.ToString());
             }
         }
@@ -415,12 +420,12 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("NumX Get", cameraNumX.ToString());
-                return cameraNumX;
+                tl.LogMessage("NumX Get", width.ToString());
+                return width;
             }
             set
             {
-                cameraNumX = value;
+                width = value;
                 tl.LogMessage("NumX set", value.ToString());
             }
         }
@@ -429,12 +434,12 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("NumY Get", cameraNumY.ToString());
-                return cameraNumY;
+                tl.LogMessage("NumY Get", height.ToString());
+                return height;
             }
             set
             {
-                cameraNumY = value;
+                height = value;
                 tl.LogMessage("NumY set", value.ToString());
             }
         }
@@ -467,13 +472,13 @@ namespace ASCOM.microlux
         {
             get
             {
-                tl.LogMessage("Gain Get", cameraGain.ToString());
-                return (short) cameraGain;
+                tl.LogMessage("Gain Get", gain.ToString());
+                return (short) gain;
             }
             set
             {
                 tl.LogMessage("Gain Set", value.ToString());
-                cameraGain = value;
+                gain = value;
             }
         }
 
