@@ -6,6 +6,7 @@
 /driver/ascom/microlux-driver/obj
 /hardware/eagle/*.TXT
 **/packages
+*.exe
 *.sw*
 *.suo
 *.user
