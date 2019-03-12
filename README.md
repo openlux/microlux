@@ -4,7 +4,7 @@ This project is still in development.
 
 microlux is an open source design for an astrophotography autoguiding camera designed around the Aptina AR0130 image sensor.
 
-## Hardware specifications
+### Hardware specifications
 
 * AR0130 image sensor in ILCC48 package
   * 1280x960 resolution
@@ -22,20 +22,20 @@ microlux is an open source design for an astrophotography autoguiding camera des
   * Micro USB connector
   * RJ12 connector for ST4-compatible autoguiding
 
-## PCB fab capability requirements
+### PCB fab requirements
 
-* Min. trace width <= 6mil
-* Min. trace/pad spacing <= 6mil
-* Min. drill <= 0.35mm
-* Max. drill >= 2.7mm
-* Min. via diameter <= 0.6mm
-* Min. copper thickness >= 1.37mil (1oz/ft<sup>2</sup>)
+* Min. trace width 6mil
+* Min. trace/pad spacing 6mil
+* Min. drill 0.35mm
+* Max. drill 2.7mm
+* Min. via diameter 0.6mm
+* Copper thickness 1.37mil (1oz/ft<sup>2</sup>)
 * PCB thickness 0.8-1.6mm
 
-## PCB photo
+### PCB photo
 
 ![Microlux photo](img/microlux-photo.png)
 
-## PCB render
+### PCB render
 
 ![Microlux PCB render](img/microlux-render-top.png)
