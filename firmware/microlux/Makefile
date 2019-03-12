@@ -5,9 +5,11 @@ A51_SOURCES=dscr.a51
 BASENAME=microlux
 BUILDDIR=build
 
-.PHONY: copy
-copy: ihx
-	cp $(BUILDDIR)/$(BASENAME).ihx $(BUILDDIR)/$(BASENAME).hex
+.PHONY: hex
+
+hex: $(BUILDDIR)/$(BASENAME).hex
+
+$(BUILDDIR)/$(BASENAME).hex: $(BUILDDIR)/$(BASENAME).ihx
+	cp $< $@
 
 include $(FX2LIB)/lib/fx2.mk
-
