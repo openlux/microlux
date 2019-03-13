@@ -85,7 +85,7 @@ void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
     bool reset = memcmp(&exposure_config, new_config, sizeof(exposure_config));
 
     /* if exposure duration is >250ms (2097 lines) then reset the sensor to abort current exposure */
-    if (exposing && reset && (new_config->duration_coarse > 2097)) {
+    if (exposing && reset && (exposure_config.duration_coarse > 2097)) {
         ar0130_stop_exposure();
     }
 
