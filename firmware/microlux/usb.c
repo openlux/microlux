@@ -31,6 +31,7 @@ void usb_init(void) {
     SYNCDELAY;
 
     EP2CFG = bmVALID | bmDIR | bmTYPE1;
+    EP2CFG &= ~bmVALID;
     SYNCDELAY;
 
     EP4CFG = bmVALID | bmTYPE1;

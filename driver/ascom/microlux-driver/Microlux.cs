@@ -4,10 +4,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace ASCOM.microlux
 {
@@ -26,29 +24,19 @@ namespace ASCOM.microlux
         private const int QUEUE_DEPTH = 256;
         private const int BUFFER_SIZE = 65536;
 
-        private readonly object _lock = new object();
-
         private readonly string serialNumber;
 
         private readonly BlockingCollection<Buffer> bufferQueue    = new BlockingCollection<Buffer>(new ConcurrentQueue<Buffer>(), QUEUE_DEPTH);
         private readonly BlockingCollection<byte[]> frameDataQueue = new BlockingCollection<byte[]>(new ConcurrentQueue<byte[]>(), 4);
         private readonly BlockingCollection<int[,]> frameQueue     = new BlockingCollection<int[,]>(new ConcurrentQueue<int[,]>(), 1);
 
+        private Connection connection;
         private USBDevice device;
         private TransferQueue transferQueue;
-        private bool abort = false;
 
         public Microlux(string serialNumber)
         {
             this.serialNumber = serialNumber;
-
-            Init();
-        }
-
-        public void Init()
-        {
-            new Thread(DecodeThread).Start();
-            new Thread(BufferThread).Start();
         }
 
         public void Connect()
@@ -67,12 +55,12 @@ namespace ASCOM.microlux
 
             fifoPipe.Policy.RawIO = true;
 
-            lock (_lock)
-            {
-                abort = false;
-                transferQueue = new TransferQueue(fifoPipe, QUEUE_DEPTH, BUFFER_SIZE);
-            }
-            
+            transferQueue = new TransferQueue(fifoPipe, QUEUE_DEPTH, BUFFER_SIZE);
+            connection = new Connection();
+
+            new Thread(DecodeThread).Start();
+            new Thread(BufferThread).Start();
+
             new Thread(TransferThread).Start();
         }
 
@@ -104,6 +92,8 @@ namespace ASCOM.microlux
         public void StopExposure()
         {
             device.ControlOut(0x41, 0x81, 0, 2);
+
+            frameQueue.Add(new int[1284, 966]);
         }
 
         public int[,] ReadFrame()
@@ -113,9 +103,16 @@ namespace ASCOM.microlux
 
         public void DecodeThread()
         {
+            var connection = this.connection;
+
             while (true)
             {
-                byte[] data = frameDataQueue.Take();
+                lock (connection)
+                {
+                    if (!connection.Connected) return;
+                }
+
+                if (!frameDataQueue.TryTake(out byte[] data, 1000)) continue;
 
                 var frame = new int[FRAME_WIDTH, FRAME_HEIGHT];
 
@@ -133,20 +130,28 @@ namespace ASCOM.microlux
                     }
                 }
 
+                frameQueue.TryTake(out int[,] clear);
                 frameQueue.TryAdd(frame);
             }
         }
 
         public void BufferThread()
         {
+            var connection = this.connection;
+
             var ringBuffer = new RingBuffer(FRAME_BUFFER_SIZE);
             var syncing = true;
 
-            while (true)
+            try
             {
-                try
+                while (true)
                 {
-                    var buffer = bufferQueue.Take();
+                    lock (connection)
+                    {
+                        if (!connection.Connected) return;
+                    }
+
+                    if (!bufferQueue.TryTake(out Buffer buffer, 1000)) continue;
                     ringBuffer.Write(buffer.Data, 0, buffer.Length);
 
                     if (syncing)
@@ -166,36 +171,46 @@ namespace ASCOM.microlux
                             syncing = true;
                         }
                     }
-                } catch (Exception) { }
+                }
+            }
+            catch (Exception)
+            {
+                Disconnect();
             }
         }
 
         public void TransferThread()
         {
+            var connection = this.connection;
+
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             try
             {
                 while (true)
                 {
-                    lock (_lock)
+                    lock (connection)
                     {
-                        if (abort)
-                        {
-                            return;
-                        }
+                        if (!connection.Connected) return;
                     }
 
                     bufferQueue.TryAdd(transferQueue.Read());
                 }
-            } catch (Exception) { }
+            } catch (Exception) {
+                Disconnect();
+            }
         }
 
         public void Disconnect()
         {
-            lock (_lock)
+            try
             {
-                abort = true;
+                StopExposure();
+            } catch (Exception) {}
+
+            lock(connection)
+            {
+                connection.Connected = false;
             }
 
             device.Dispose();
@@ -287,6 +302,12 @@ namespace ASCOM.microlux
 
             return list;
         }
+    }
+
+    class Connection
+    {
+        public bool Connected { get; set; } = true;
+        public object _Lock { get; } = new object();
     }
 
     class MicroluxDevice

@@ -22,11 +22,7 @@ void main(void) {
     i2c_init();
     ar0130_init();
 
-    /* switch to external 48 MHz IFCLK */
-    IFCONFIG = 0;
-
     usb_init();
-    usb_fifo_init();
 
     /* enable interrupts */
     EA = 1;

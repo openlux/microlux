@@ -22,10 +22,10 @@ namespace ASCOM.microlux
         private const string TRACE_STATE_PROFILE_NAME = "Trace Level";
         private const string TRACE_STATE_DEFAULT = "false";
 
-        internal static string serialNumber = string.Empty;
         internal static TraceLogger tl;
 
-        private bool connectedState;
+        internal static string serialNumber = string.Empty;
+
         private Microlux microlux;
  
         private Util utilities;
@@ -38,7 +38,7 @@ namespace ASCOM.microlux
 
             tl.LogMessage("Camera", "Starting initialisation");
 
-            connectedState = false;
+            IsConnected = false;
             utilities = new Util();
             astroUtilities = new AstroUtils();
 
@@ -124,7 +124,7 @@ namespace ASCOM.microlux
 
                     microlux.StartExposure(startX, startX + width + 3, startY + 2, startY + height + 5, 0x40, 0xA8, 100, 0, 1430);
 
-                    connectedState = true;
+                    IsConnected = true;
                     LogMessage("Connected Set", "Connecting to port {0}", serialNumber);
                 }
                 else
@@ -134,7 +134,7 @@ namespace ASCOM.microlux
                         microlux.Disconnect();
                     }
 
-                    connectedState = false;
+                    IsConnected = false;
                     LogMessage("Connected Set", "Disconnecting from port {0}", serialNumber);
                 }
             }
@@ -235,9 +235,22 @@ namespace ASCOM.microlux
 
             tl.LogMessage("StartExposure", Duration.ToString() + " " + Light.ToString());
 
-            var exposureCoarse = (int) (Duration / 0.00011916666d);
-            var exposureFine = 0;
             var lineWidth = 1430;
+
+            var exposureCoarse = (int) (Duration / (lineWidth / 12000000d));
+
+            if (exposureCoarse > 65535)
+            {
+                lineWidth = (int) Math.Ceiling(exposureCoarse * 1430d / 65535d);
+                exposureCoarse = (int)(Duration / (lineWidth / 12000000d));
+            }
+
+            if (lineWidth < 1430) lineWidth = 1430;
+            if (exposureCoarse < 1) exposureCoarse = 1;
+            if (exposureCoarse > 65535) exposureCoarse = 65535;
+            if (lineWidth > 65535) lineWidth = 65535;
+
+            var exposureFine = 0;
 
             microlux.StartExposure(startX, startX + width + 3, startY + 2, startY + height + 5, gain, OFFSET, exposureCoarse, exposureFine, lineWidth);
             cameraImageReady = true;
@@ -245,14 +258,14 @@ namespace ASCOM.microlux
 
         public void StopExposure()
         {
-            tl.LogMessage("StopExposure", "Not implemented");
+            tl.LogMessage("StopExposure", "");
             microlux.StopExposure();
             cameraImageReady = false;
         }
 
         public void AbortExposure()
         {
-            tl.LogMessage("AbortExposure", "Not implemented");
+            tl.LogMessage("AbortExposure", "");
             StopExposure();
         }
 
@@ -528,7 +541,7 @@ namespace ASCOM.microlux
             get
             {
                 tl.LogMessage("CanAbortExposure Get", false.ToString());
-                return false;
+                return true;
             }
         }
 
@@ -573,7 +586,7 @@ namespace ASCOM.microlux
             get
             {
                 tl.LogMessage("CanStopExposure Get", false.ToString());
-                return false;
+                return true;
             }
         }
 
@@ -814,14 +827,7 @@ namespace ASCOM.microlux
 
         #endregion
 
-        private bool IsConnected
-        {
-            get
-            {
-                // TODO check connection
-                return connectedState;
-            }
-        }
+        private bool IsConnected { get; set; }
 
         private void CheckConnected(string message)
         {
