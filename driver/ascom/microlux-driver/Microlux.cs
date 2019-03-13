@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace ASCOM.microlux
 {
@@ -22,8 +21,10 @@ namespace ASCOM.microlux
         private const int FRAME_SIZE = FRAME_WIDTH * FRAME_HEIGHT * 2;
         private const int FRAME_BUFFER_SIZE = FRAME_SIZE * 4;
 
-        private const int QUEUE_DEPTH = 256;
-        private const int BUFFER_SIZE = 65536;
+        private const int QUEUE_DEPTH = 512;
+        private const int BUFFER_SIZE = 16384;
+
+        private const int ZEBRA_SIZE = 23112;
 
         private readonly string serialNumber;
 
@@ -169,14 +170,15 @@ namespace ASCOM.microlux
                             byte[] frameData = ringBuffer.Read(FRAME_SIZE);
                             frameDataQueue.TryAdd(frameData);
 
+                            ringBuffer.Consume(ZEBRA_SIZE);
+
                             syncing = true;
                         }
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show(e.Message + ", " + e.StackTrace);
                 Disconnect();
             }
         }
@@ -198,8 +200,7 @@ namespace ASCOM.microlux
 
                     bufferQueue.TryAdd(transferQueue.Read());
                 }
-            } catch (Exception e) {
-                MessageBox.Show(e.Message + ", " + e.StackTrace);
+            } catch (Exception) {
                 Disconnect();
             }
         }
@@ -209,9 +210,7 @@ namespace ASCOM.microlux
             try
             {
                 StopExposure();
-            } catch (Exception e) {
-                MessageBox.Show(e.Message + ", " + e.StackTrace);
-            }
+            } catch (Exception) {}
 
             lock(connection)
             {

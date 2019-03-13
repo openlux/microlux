@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ASCOM.microlux
 {
@@ -36,13 +33,12 @@ namespace ASCOM.microlux
                     }
                 }
 
-                Console.WriteLine("Skipped " + i + " bytes to sync");
                 Consume(i);
                 return true;
 
             outer:
                 {
-                    // todo
+                    // do nothing, this is used as a marker to break inner loop then continue outer loop
                 }
             }
 
@@ -73,7 +69,6 @@ namespace ASCOM.microlux
             if (size + length > buffer.Length)
             {
                 Consume(length);
-                //throw new Exception("RingBuffer full");
             }
 
             Array.Copy(data, offset, buffer, writeIndex, length);

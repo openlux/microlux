@@ -17,7 +17,10 @@
 #define AR0130_RESET  0x0001
 
 #define AR0130_REGISTER_PLL 0x30B0
-#define AR0130_PLL_DEFAULT  0x5000
+#define AR0130_PLL_DEFAULT  0x5C00
+
+#define AR0130_REGISTER_DARK_CONTROL 0x3044
+#define AR0130_DARK_CONTROL_DEFAULT 0x0080
 
 #define AR0130_REGISTER_X_START 0x3004
 #define AR0130_REGISTER_X_END   0x3008
@@ -76,6 +79,9 @@ void ar0130_init(void) {
     /* bypass the PLL */
     ar0130_write(AR0130_REGISTER_PLL, AR0130_PLL_DEFAULT);
 
+    /* enable zebra lines */
+    ar0130_write(AR0130_REGISTER_DARK_CONTROL, AR0130_DARK_CONTROL_DEFAULT);
+
     /* enable parallel interface and disable stby_eof */
     ar0130_write(AR0130_REGISTER_RESET, AR0130_RESET_DEFAULT);
 }
@@ -105,6 +111,9 @@ void ar0130_start_exposure(struct ar0130_exposure_config *new_config) {
     if (!exposing) {
         /* bypass the PLL */
         ar0130_write(AR0130_REGISTER_PLL, AR0130_PLL_DEFAULT);
+
+        /* enable zebra lines */
+        ar0130_write(AR0130_REGISTER_DARK_CONTROL, AR0130_DARK_CONTROL_DEFAULT);
 
         /* enable parallel interface, disable stby_eof and enable streaming */
         ar0130_write(AR0130_REGISTER_RESET, AR0130_RESET_DEFAULT | AR0130_STREAM);
